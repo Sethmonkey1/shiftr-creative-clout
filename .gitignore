@@ -1,0 +1,9 @@
+dist/
+node_modules/
+reference/source.html
+reference/inspection.json
+reference/original-*
+output/
+*.log
+.env
+.DS_Store

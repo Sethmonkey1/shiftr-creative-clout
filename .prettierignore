@@ -1,0 +1,7 @@
+dist/
+node_modules/
+assets/
+output/
+reference/source.html
+reference/inspection.json
+reference/original-media/

@@ -1,0 +1,17 @@
+{
+  "name": "shiftr-creative-clout",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "An editable local landing page study for Shiftr, inspired by Creative Clout",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/preview.mjs",
+    "start": "node scripts/preview.mjs",
+    "check": "node scripts/check.mjs"
+  }
+}
