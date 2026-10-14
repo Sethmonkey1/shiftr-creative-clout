@@ -46,12 +46,18 @@ export function serve({ port = Number(process.env.PORT || 4178) } = {}) {
       const headers = {
         "Content-Type": types[path.extname(file)] || "application/octet-stream",
         "Cache-Control": "no-cache",
+        ETag: `W/"${info.size}-${Math.trunc(info.mtimeMs)}"`,
         "Accept-Ranges": "bytes",
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "no-referrer",
         "Content-Security-Policy":
           "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' https://vz-41f371e2-ff7.b-cdn.net blob:; connect-src 'self' https://vz-41f371e2-ff7.b-cdn.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
       };
+      if (req.headers["if-none-match"] === headers.ETag) {
+        res.writeHead(304, headers);
+        res.end();
+        return;
+      }
       const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || "");
       if (range) {
         const suffix = range[1] === "";

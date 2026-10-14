@@ -1,3 +1,5 @@
+import { displayImages } from "../data/display-images.mjs";
+
 export const esc = (value) =>
   String(value).replace(
     /[&<>"']/g,
@@ -33,5 +35,12 @@ export const button = (label = "Let’s talk", cls = "") =>
   `<button class="button ${cls}" data-book>${esc(label)}<span class="button-arrow">${icon("arrow")}</span></button>`;
 export const heading = (eyebrow, title, description = "", name = "spark") =>
   `<div class="section-heading"><span class="eyebrow">${icon(name)}${eyebrow}</span><h2>${title}</h2>${description ? `<p>${description}</p>` : ""}</div>`;
-export const image = (src, alt, cls = "", extra = "") =>
-  `<img src="${esc(src)}" alt="${esc(alt)}" class="${cls}" loading="lazy" decoding="async" ${extra}>`;
+export const thumbnail = (src) => displayImages[src]?.small || src;
+export const image = (src, alt, cls = "", extra = "") => {
+  const variant = displayImages[src];
+  const dimensions = variant && !/\bwidth=/.test(extra)
+    ? `width="${variant.width}" height="${variant.height}"`
+    : "";
+  const loading = /\bloading=/.test(extra) ? "" : 'loading="lazy"';
+  return `<img src="${esc(variant?.src || src)}" alt="${esc(alt)}" class="${cls}" ${loading} decoding="async" ${dimensions} ${extra}>`;
+};

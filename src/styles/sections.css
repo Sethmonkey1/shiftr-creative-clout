@@ -1262,14 +1262,15 @@ tbody td:last-child {
 .footer-bottom > a {
   white-space: nowrap;
 }
-.reel-button > video {
+.reel-button > video,
+.reel-button > img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.reel-button:has(> video):after {
+.reel-button:has(> video, > img):after {
   background: linear-gradient(transparent 65%, #16110e80);
 }
 .reel-watch {

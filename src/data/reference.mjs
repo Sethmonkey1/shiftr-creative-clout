@@ -1,5 +1,6 @@
 import { assetMap } from "./asset-map.mjs";
-const image = (name) => assetMap[name];
+import { displayImages } from "./display-images.mjs";
+const image = (name) => displayImages[assetMap[name]]?.src || assetMap[name];
 export const media = {
   icon: image("VgYF8ll7IxP98EH8danWAe2WKNA"),
   logo: image("LPon8whB2gYaXwZINIQ4ZCHZhw"),

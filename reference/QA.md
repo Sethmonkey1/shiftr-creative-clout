@@ -17,3 +17,13 @@ Verified October 10, 2026.
 - Existing Shiftr Growth Git status was unchanged from the start of this task.
 
 Local screenshots are saved in ignored `output/phone.jpg` and `output/desktop.jpg`.
+
+## Performance pass
+
+- The study hero uses a still image; the 8.95 MB showreel loads when opened.
+- Display image preparation reduced the source-image pixel total from 92,490,624 to 12,521,087. Hero background tiles now use 480px images instead of originals up to 3,218px wide.
+- Only one visible decorative preview plays at a time. Verified with the channel cards in view; opening the booking dialog pauses all previews. The logo strip pauses offscreen.
+- Preview asset responses use ETags: verified initial HTTP 200 and conditional HTTP 304.
+- An unchanged rebuild preserves the showreel file timestamp instead of copying it again.
+- Build and integrity checks passed. Desktop 1440px, tablet 768px, and phone 320px layouts have no horizontal overflow. Pricing controls and the local showreel dialog still work.
+- These browser checks apply to the study layout loaded during this pass. Concurrent edits introducing a separate reference renderer were preserved and are outside this verification.

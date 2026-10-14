@@ -60,6 +60,7 @@ let previousFocus;
 function openModal(dialog) {
   previousFocus = document.activeElement;
   dialog.showModal();
+  syncMedia();
 }
 document.querySelectorAll("dialog").forEach((dialog) => {
   dialog
@@ -78,7 +79,10 @@ document.querySelectorAll("dialog").forEach((dialog) => {
     )
       dialog.close();
   });
-  dialog.addEventListener("close", () => previousFocus?.focus());
+  dialog.addEventListener("close", () => {
+    previousFocus?.focus();
+    syncMedia();
+  });
 });
 
 let hls;
@@ -148,7 +152,7 @@ document.querySelectorAll("[data-project]").forEach((button) =>
     const project = button.hasAttribute("data-showreel")
       ? {
           name: "Creative Clout showreel",
-          image: "/assets/reference/showreel.jpg",
+          image: "/assets/display/showreel.webp",
           video: "/assets/reference/showreel.mp4",
           source: site.referenceUrl,
         }
@@ -251,32 +255,46 @@ clearRequest.addEventListener("click", () => {
 
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 const loopVideos = [...document.querySelectorAll("[data-loop]")];
-const visible = new Set();
+const visible = new Map();
+const marquee = document.querySelector(".logo-track");
+let marqueeVisible = false;
+
+// Decode one decorative preview at a time. Other cards retain their stills.
+function syncMedia() {
+  const allowed = !document.hidden && !reduced.matches &&
+    !document.querySelector("dialog[open]");
+  const active = allowed
+    ? [...visible].sort((a, b) => b[1] - a[1])[0]?.[0]
+    : undefined;
+  loopVideos.forEach((video) => {
+    if (video !== active) {
+      video.pause();
+      return;
+    }
+    if (!video.getAttribute("src")) video.src = video.dataset.src;
+    if (video.paused) video.play().catch(() => {});
+  });
+  if (marquee) marquee.style.animationPlayState =
+    allowed && marqueeVisible ? "running" : "paused";
+}
 const observer = new IntersectionObserver(
   (entries) => {
-    entries.forEach(({ target, isIntersecting }) => {
-      if (isIntersecting) {
-        visible.add(target);
-        if (!reduced.matches) target.play().catch(() => {});
-      } else {
-        visible.delete(target);
-        target.pause();
-      }
+    entries.forEach(({ target, isIntersecting, intersectionRatio }) => {
+      if (isIntersecting) visible.set(target, intersectionRatio);
+      else visible.delete(target);
     });
+    syncMedia();
   },
-  { threshold: 0.15 },
+  { threshold: [0.15, 0.5, 0.85] },
 );
 loopVideos.forEach((video) => observer.observe(video));
-reduced.addEventListener("change", () =>
-  loopVideos.forEach((video) => {
-    if (reduced.matches) video.pause();
-    else if (visible.has(video)) video.play().catch(() => {});
-  }),
-);
-document.addEventListener("visibilitychange", () =>
-  loopVideos.forEach((video) => {
-    if (document.hidden) video.pause();
-    else if (visible.has(video) && !reduced.matches)
-      video.play().catch(() => {});
-  }),
-);
+if (marquee) {
+  const marqueeObserver = new IntersectionObserver(([entry]) => {
+    marqueeVisible = entry.isIntersecting;
+    syncMedia();
+  });
+  marqueeObserver.observe(marquee.parentElement);
+}
+reduced.addEventListener("change", syncMedia);
+document.addEventListener("visibilitychange", syncMedia);
+syncMedia();
